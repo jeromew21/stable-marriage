@@ -8,7 +8,7 @@ Online at http://jerome.cloud/stable-marriage/
 
 React is an interesting framework. Working with pure state is very powerful but forces you to think in a particular way --- that the visual of your program is a function of the execution state (an object) of your program. So everything has to represented as a discrete state. This lends itself well to an algoritm like GS.
 
-The drawbacks of React are 1) the stateful paradigm is kind of limited, doing dynamic stuff like changing the number of elements to be rendered feels hacky and dangerous and 2) it's a resource monster
+The drawbacks of React are 1) the stateful paradigm is kind of limited, doing dynamic stuff like changing the number of elements to be rendered feels hacky and dangerous and 2) it's a resource monster 3) there are a lot of gotchas that make debugging pretty nasty
 
 ## Features to add
 
