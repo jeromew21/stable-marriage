@@ -314,12 +314,12 @@ class InputChanger extends Component {
 
   onChange(event) {
     this.props.callback(event.target.value);
-    this.setState({value: this.props.parent.aliased_str(event.target.value)})
+    this.setState({value: event.target.value})
   }
 
   render() {
     return (
-      <input type="text" value={this.state.value} onChange={this.onChange.bind(this)} />
+      <input type="text" defaultValue={this.state.value} onBlur={this.onChange.bind(this)} />
     )
   }
 }
