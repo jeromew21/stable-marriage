@@ -34,8 +34,43 @@ class App extends Component {
         m1: [],
         m2: [],
         m3: [],
+      },
+      days: [],
+    }
+  }
+
+  stepAlg() {
+    let new_matching = this.state.matching;
+    new_matching.days.push("day")
+    for (let woman of Object.keys(this.state.matching.proposals)) {
+      new_matching.proposals[woman].push([]);
+    }
+    for (let man of this.state.men) {
+      for (let woman of this.state.prefs.men[man]) {
+        if (!this.state.matching.rejections[man].includes(woman)) {
+          new_matching.proposals[woman].slice(-1)[0].push(man);
+          break; //proposal complete
+        }
       }
     }
+    for (let woman of Object.keys(this.state.matching.proposals)) {
+      let suitors = new_matching.proposals[woman].slice(-1)[0];
+      //Find the best man
+      let best_man = "";
+      for (let man of this.state.prefs.women[woman]) {
+        if (suitors.includes(man)) {
+          best_man = man;
+          break;
+        }
+      }
+      //Reject everyone else
+      for (let man of suitors) {
+        if (man != best_man) {
+          new_matching.rejections[man].push(woman);
+        }
+      }
+    }
+    this.setState({matching: new_matching});
   }
 
   render() {
@@ -56,13 +91,21 @@ class App extends Component {
                 men: {},
                 women: {},
               }
+
+              let matching = {
+                proposals: {},
+                rejections: {},
+                days: [],
+              }
               
               for (let man of men) {
                 prefs.men[man] = women.slice(0)
+                matching.rejections[man] = [];
               }
 
               for (let woman of women) {
                 prefs.women[woman] = men.slice(0)
+                matching.proposals[woman] = [];
               }
 
               this.setState({
@@ -70,10 +113,10 @@ class App extends Component {
                 men: men,
                 women: women,
                 prefs: prefs,
+                matching: matching
               }) // Components will rest INSIDE state. I think this works.
             }
           }} />
-          {JSON.stringify(this.state.prefs)}
         </div>
         <div>
           Men: {this.state.men.join(", ")}
@@ -81,6 +124,21 @@ class App extends Component {
         <div>
           Women: {this.state.women.join(", ")}
         </div>
+        <button onClick={this.stepAlg.bind(this)}>Step</button>
+
+        <table cellSpacing={0}>
+          <tr><td>Woman</td>{this.state.matching.days.map((val, i) => {return <td>{"Day " + (i+1)}</td>})}</tr>
+          {Object.keys(this.state.matching.proposals).map((key, index) => {
+            return (
+              <tr>
+                <td>{key}</td>
+                {this.state.matching.proposals[key].map((group, i) => {
+                  return (<td>{group.join(", ")}</td>)
+                })}
+              </tr>);
+          })}
+        </table>
+
         {Object.keys(this.state.prefs.men).map((key, index) => {
           return (
             <div>
@@ -92,7 +150,6 @@ class App extends Component {
                   let new_prefs = this.state.prefs;
                   new_prefs.men[key] = arrayMove(new_prefs.men[key], o, n);
                   this.setState({prefs: new_prefs})
-                  console.log("hii")
                 }}
               />
             </div>
