@@ -17,9 +17,17 @@ li {
   cursor: pointer;
 }
 
+ul {
+  list-style: none !important;
+}
+
 li, ol, ul {
   user-select: none;
   -moz-user-select: none;
+}
+
+table {
+  border-collapse: collapse;
 }
 
 td {
@@ -36,7 +44,7 @@ td {
 .prefListItem {
   border: 1px solid #444444;
   list-style-position:inside;
-  padding: 0.2em;
+  padding: 0.3em 0.7em 0.3em 0.7em;
   border-radius: 3px;
   background: white;
   margin: 2px;
@@ -53,4 +61,19 @@ td {
   padding-left: 0px;
 }
 
+input {
+  width: 6em;
+}
 
+a {
+  border-bottom: 1px solid #444444; 
+  color: #444444; 
+  text-decoration: none;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+a:hover {
+  border-bottom: 1px solid #f2f2f2;
+  transition: 0.2s;
+}
