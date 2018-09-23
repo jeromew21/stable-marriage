@@ -64,21 +64,11 @@ class App extends Component {
     }
   }
 
-  stepAlg() {
+  async stepAlg() {
     if (this.state.done) {
       return
     }
     let new_matching = this.state.matching;
-    let flag = true;
-    for (let woman of Object.keys(this.state.matching.proposals)) {
-      if (this.state.matching.proposals[woman].length < 1 || this.state.matching.proposals[woman].slice(-1)[0].length !== 1) {
-        flag = false;
-      }
-    }
-    if (flag) {
-      this.setState({done: true})
-      return
-    }
     new_matching.days.push("day")
     for (let woman of Object.keys(this.state.matching.proposals)) {
       new_matching.proposals[woman].push([]);
@@ -109,6 +99,16 @@ class App extends Component {
       }
     }
     this.setState({matching: new_matching});
+    let flag = true;
+    for (let woman of Object.keys(this.state.matching.proposals)) {
+      if (this.state.matching.proposals[woman].length < 1 || this.state.matching.proposals[woman].slice(-1)[0].length !== 1) {
+        flag = false;
+      }
+    }
+    if (flag) {
+      this.setState({done: true})
+      return
+    }
   }
 
   aliased_str(n) {
@@ -161,10 +161,8 @@ class App extends Component {
     for (let man of men) {
       if (resetPrefs) {
         var arr = women.slice(0);
-        console.log(arr)
         if (doweshuffle) {
           shuffle(arr);
-          console.log(arr)
         }
 
         prefs.men[man] = arr;
@@ -196,7 +194,9 @@ class App extends Component {
   add_alias(old, n) {
     let new_aliases = this.state.aliases;
     new_aliases[old] = n;
-    this.setState({aliases: new_aliases});
+    this.setState((prevState, props) => {
+      return {aliases: new_aliases};
+    })
   }
 
   render() {
@@ -213,7 +213,7 @@ class App extends Component {
           Men: {this.state.men.map((val, i) => {
             return (
               <InputChanger
-                key={this.aliased_str(val)}
+                key={val + this.aliased_str(val)}
                 parent={this}
                 initial={this.aliased_str(val)} 
                 callback={(value) => {this.add_alias(val, value)}}
@@ -225,7 +225,7 @@ class App extends Component {
           Women: {this.state.women.map((val, i) => {
             return (
               <InputChanger 
-                key={this.aliased_str(val)}
+                key={val + this.aliased_str(val)}
                 parent={this}
                 initial={this.aliased_str(val)} 
                 callback={(value)=>{this.add_alias(val, value)}}
@@ -239,6 +239,11 @@ class App extends Component {
         </div>
 
         <button onClick={this.stepAlg.bind(this)}>Step</button>
+        <button onClick={async () => {
+          for (var i = 0; i < this.state.n * this.state.n; i++) {
+            await this.stepAlg()
+          }
+        }}>Complete</button>
         <button onClick={() => {this.restart(this.state.n, false, false)}}>Restart</button>
 
         <table cellSpacing={0}>
@@ -258,6 +263,19 @@ class App extends Component {
           })}
           </tbody>
         </table>
+
+        {this.state.done ? (
+          <div>
+            <h4>Output:</h4>
+            {Object.keys(this.state.matching.proposals).map((key, i) => {
+              return (
+                <div>
+                  ({this.aliased(key)}, {this.aliased(this.state.matching.proposals[key].slice(-1)[0][0])})
+                </div>
+              )
+            })}
+          </div>
+        ) : ""}
 
         <h4>
           Preferences<span> </span>
