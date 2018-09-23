@@ -12,6 +12,9 @@ class App extends Component {
     ],
     men: ["m1", "m2", "m3"],
     women: ["w1", "w2", "w3"],
+    aliases: {
+      m1: "Brad"
+    },
     prefs: {
       men: {
         m1: ["w1", "w2", "w3"],
@@ -65,7 +68,7 @@ class App extends Component {
       }
       //Reject everyone else
       for (let man of suitors) {
-        if (man != best_man) {
+        if (man !== best_man) {
           new_matching.rejections[man].push(woman);
         }
       }
@@ -73,12 +76,19 @@ class App extends Component {
     this.setState({matching: new_matching});
   }
 
+  aliased(n) {
+    if (this.state.aliases.hasOwnProperty(n)) {
+      return this.state.aliases[n]
+    }
+    return n
+  }
+
   render() {
     return (
       <div>
+        <h3>Stable Marriage /// Gale Shapley Algorithm</h3>
         <div>
-          n = {this.state.n}
-          <NumberChanger callback={(value) => {
+          n = <NumberChanger initial={3} callback={(value) => {
             if (value > 0 && value < 100) {
               let men = [];
               let women = [];
@@ -119,14 +129,15 @@ class App extends Component {
           }} />
         </div>
         <div>
-          Men: {this.state.men.join(", ")}
+          Men: {this.state.men.map((val, i) => {return this.aliased(val)}).join(", ")}
         </div>
         <div>
-          Women: {this.state.women.join(", ")}
+          Women: {this.state.women.map((val, i) => {return this.aliased(val)}).join(", ")}
         </div>
         <button onClick={this.stepAlg.bind(this)}>Step</button>
 
         <table cellSpacing={0}>
+          <tbody>
           <tr><td>Woman</td>{this.state.matching.days.map((val, i) => {return <td>{"Day " + (i+1)}</td>})}</tr>
           {Object.keys(this.state.matching.proposals).map((key, index) => {
             return (
@@ -137,18 +148,41 @@ class App extends Component {
                 })}
               </tr>);
           })}
+          </tbody>
         </table>
+
+        <h4>Preferences</h4>
+        <div><button>Randomize</button></div>
 
         {Object.keys(this.state.prefs.men).map((key, index) => {
           return (
-            <div>
-              {key}
+            <div className="prefList">
+              <div className="prefListTitle">{key}</div>
               <SortableComponent 
+                parent={this}
                 key={this.state.n + "" + key + "" + index} 
                 items={this.state.prefs.men[key]}
                 callback={(o, n) => {
                   let new_prefs = this.state.prefs;
                   new_prefs.men[key] = arrayMove(new_prefs.men[key], o, n);
+                  this.setState({prefs: new_prefs})
+                }}
+              />
+            </div>
+          )
+        })}
+
+        {Object.keys(this.state.prefs.women).map((key, index) => {
+          return (
+            <div className="prefList">
+              <div className="prefListTitle">{key}</div>
+              <SortableComponent 
+                parent={this}
+                key={this.state.n + "" + key + "" + index} 
+                items={this.state.prefs.women[key]}
+                callback={(o, n) => {
+                  let new_prefs = this.state.prefs;
+                  new_prefs.women[key] = arrayMove(new_prefs.women[key], o, n);
                   this.setState({prefs: new_prefs})
                 }}
               />
@@ -167,22 +201,20 @@ class NumberChanger extends Component {
 
   render() {
     return (
-      <div>
-        <input type="number" onChange={this.onChange.bind(this)} />
-      </div>
+      <input type="number" value={this.props.initial} onChange={this.onChange.bind(this)} />
     )
   }
 }
 
-const SortableItem = SortableElement(({value}) =>
-  <li>{value}</li>
+const SortableItem = SortableElement(({value, parent}) =>
+  <li className="prefListItem">{parent.aliased(value)}</li>
 );
 
-const SortableList = SortableContainer(({items}) => {
+const SortableList = SortableContainer(({items, parent}) => {
   return (
-    <ol>
+    <ol className="prefListList">
       {items.map((value, index) => (
-        <SortableItem key={`item-${index}`} index={index} value={value} />
+        <SortableItem parent={parent} key={`item-${index}`} index={index} value={value} />
       ))}
     </ol>
   );
@@ -204,7 +236,7 @@ class SortableComponent extends Component {
   }
 
   render() {
-    return <SortableList items={this.state.items} onSortEnd={this.onSortEnd} />;
+    return <SortableList parent={this.props.parent} items={this.state.items} onSortEnd={this.onSortEnd} />;
   }
 }
 

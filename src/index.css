@@ -9,6 +9,10 @@ body {
   max-width: 90%;
 }
 
+h1, h2, h3, h4 {
+  line-height:1.2
+}
+
 li {
   cursor: pointer;
 }
@@ -23,3 +27,30 @@ td {
   font-size: 0.6em;
   padding: 0.4em;
 }
+
+.prefListTitle {
+  font-weight: bolder;
+  text-align: center;
+}
+
+.prefListItem {
+  border: 1px solid #444444;
+  list-style-position:inside;
+  padding: 0.2em;
+  border-radius: 3px;
+  background: white;
+  margin: 2px;
+}
+
+.prefList {
+  width: auto;
+  float: left;
+  margin: 15px;
+}
+
+.prefListList {
+  margin: 0;
+  padding-left: 0px;
+}
+
+
