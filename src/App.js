@@ -233,36 +233,40 @@ class App extends Component {
             )
           }).reduce((prev, curr) => [prev, ', ', curr])}
         </div>
+
+        <div style={{height: "1em"}}></div>
         
         <div>
-          <button onClick={() => {this.randomNames()}}>Random Names</button>
+          <button className="btn" onClick={() => {this.randomNames()}}>Random Names</button>
         </div>
 
-        <button onClick={this.stepAlg.bind(this)}>Step</button>
-        <button onClick={async () => {
+        <button className="btn" onClick={this.stepAlg.bind(this)}>Step</button>
+        <button className="btn" onClick={async () => {
           for (var i = 0; i < this.state.n * this.state.n; i++) {
             await this.stepAlg()
           }
         }}>Complete</button>
-        <button onClick={() => {this.restart(this.state.n, false, false)}}>Restart</button>
-
-        <table cellSpacing={0}>
-          <tbody>
-          <tr><td>Proposed</td>{this.state.matching.days.map((val, i) => {return <td>{"Day " + (i+1)}</td>})}</tr>
-          {Object.keys(this.state.matching.proposals).map((key, index) => {
-            return (
-              <tr>
-                <td>{this.aliased(key)}</td>
-                {this.state.matching.proposals[key].map((group, i) => {
-                  if (group.length < 1) {
-                    return (<td></td>)
-                  }
-                  return (<td>{group.map((val, i) => {return this.aliased(val)}).reduce((prev, curr) => [prev, ', ', curr])}</td>)
-                })}
-              </tr>);
-          })}
-          </tbody>
-        </table>
+        <button className="btn" onClick={() => {this.restart(this.state.n, false, false)}}>Restart</button>
+        
+        <div className="tableContainer">
+          <table>
+            <tbody>
+            <tr><td>Proposed</td>{this.state.matching.days.map((val, i) => {return <td>{"Day " + (i+1)}</td>})}</tr>
+            {Object.keys(this.state.matching.proposals).map((key, index) => {
+              return (
+                <tr>
+                  <td><b>{this.aliased(key)}</b></td>
+                  {this.state.matching.proposals[key].map((group, i) => {
+                    if (group.length < 1) {
+                      return (<td></td>)
+                    }
+                    return (<td>{group.map((val, i) => {return this.aliased(val)}).reduce((prev, curr) => [prev, ', ', curr])}</td>)
+                  })}
+                </tr>);
+            })}
+            </tbody>
+          </table>
+        </div>
 
         {this.state.done ? (
           <div>
@@ -279,7 +283,7 @@ class App extends Component {
 
         <h4>
           Preferences<span> </span>
-          <button onClick={() => {this.restart(this.state.n, true, true)}}>Randomize</button>
+          <button className="btn" onClick={() => {this.restart(this.state.n, true, true)}}>Randomize</button>
         </h4>
 
         {Object.keys(this.state.prefs.men).map((key, index) => {
@@ -300,8 +304,7 @@ class App extends Component {
           )
         })}
 
-        <div style={{clear: "both"}}><hr /></div>
-
+        <div><hr /></div>
         {Object.keys(this.state.prefs.women).map((key, index) => {
           return (
             <div className="prefList">
@@ -369,7 +372,7 @@ const SortableList = SortableContainer(({items, parent}) => {
     <ol className="prefListList">
       {items.map((value, index) => (
         <SortableItem parent={parent} key={`item-${index}`} index={index} value={value} />
-      ))}
+      )).reduce((prev, curr) => [prev, ' > ', curr])}
     </ol>
   );
 });
@@ -390,7 +393,7 @@ class SortableComponent extends Component {
   }
 
   render() {
-    return <SortableList parent={this.props.parent} items={this.state.items} onSortEnd={this.onSortEnd} />;
+    return <SortableList axis={"x"} parent={this.props.parent} items={this.state.items} onSortEnd={this.onSortEnd} />;
   }
 }
 
